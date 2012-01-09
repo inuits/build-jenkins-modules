@@ -23,7 +23,7 @@ do
     cd BUILD/${name}/${name}
     unzip ../${name}.hpi
     if [ x$version == 'x' ]; then
-        version="$(grep Plugin-Version: < META-INF/MANIFEST.MF|cut -d ' ' -f 2|tr -d "\n")"
+        version="$(grep Plugin-Version: < META-INF/MANIFEST.MF|cut -d ' ' -f 2|tr -d "\r")"
     fi
     cd ../..
     $FPM -n "jenkins-plugin-${name}" -v "$version" -s dir -t rpm \
