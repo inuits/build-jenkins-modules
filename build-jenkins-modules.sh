@@ -34,7 +34,7 @@ EOM
         --prefix /var/lib/jenkins/plugins/ -C "${name}" \
         -a noarch --description "Jenkins plugin ${name}" \
         --url "${PLUGINS_MIRROR}/download/plugins/${name}" \
-        --post-install "BUILD/${name}/postinstall.sh"
+        --post-install "${name}/postinstall.sh"
     RETVAL="$?"
     cd ..
     echo "Build of $name returned with $RETVAL"
