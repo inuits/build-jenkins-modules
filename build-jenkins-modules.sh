@@ -13,6 +13,10 @@ do
         rm -rf "BUILD/${name}"
     fi
     mkdir -p "BUILD/${name}/${name}"
+    cat > "BUILD/${name}/postinstall.sh" << EOM
+chown -R jenkins: /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
+EOM
+    chmox +x "BUILD/${name}/postinstall.sh"
     if [ x$version == 'x' ]; then
         LINK="${PLUGINS_MIRROR}/latest/${name}.hpi"
     else
@@ -29,7 +33,8 @@ do
     $FPM -n "jenkins-plugin-${name}" -v "$version" -s dir -t rpm \
         --prefix /var/lib/jenkins/plugins/ -C "${name}" \
         -a noarch --description "Jenkins plugin ${name}" \
-        --url "${PLUGINS_MIRROR}/download/plugins/${name}"
+        --url "${PLUGINS_MIRROR}/download/plugins/${name}" \
+        --post-install "BUILD/${name}/postinstall.sh"
     RETVAL="$?"
     cd ..
     echo "Build of $name returned with $RETVAL"
