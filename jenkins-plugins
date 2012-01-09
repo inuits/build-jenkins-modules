@@ -15,6 +15,6 @@ plot
 pmd
 promoted-builds
 publish-over-ssh
-subversion
+subversion:1.35
 violations
 xunit
