@@ -15,6 +15,7 @@ do
     mkdir -p "BUILD/${name}/${name}"
     cat > "BUILD/rpm-postinstall-${name}.sh" << EOM
 chown -R jenkins: /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
+chown jenkins: /var/lib/jenkins/plugins/
 EOM
     if [ x$version == 'x' ]; then
         LINK="${PLUGINS_MIRROR}/latest/${name}.hpi"
