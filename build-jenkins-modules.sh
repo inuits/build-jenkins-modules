@@ -14,7 +14,7 @@ do
     fi
     mkdir -p "BUILD/${name}/${name}"
     if [ x$version == 'x' ]; then
-        LINK="${PLUGINS_MIRROR}/latest/${name}.hpi" -o "BUILD/${name}/${name}.hpi"
+        LINK="${PLUGINS_MIRROR}/latest/${name}.hpi"
     else
         echo "Building $name version $version"
         LINK="${PLUGINS_MIRROR}/download/plugins/${name}/${versioni}/${name}.hpi"
