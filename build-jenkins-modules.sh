@@ -15,7 +15,6 @@ do
     mkdir -p "BUILD/${name}/${name}"
     cat > "BUILD/${name}/rpm-postinstall-${name}.sh" << EOM
 chown -R jenkins: /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
-echo "You will have to restart jenkins."
 rm var/lib/jenkins/plugins/rpm-postinstall-${name}.sh
 EOM
     chmox +x "BUILD/${name}/postinstall.sh"
