@@ -7,6 +7,7 @@ for plugin in $(grep -v '#' < jenkins-plugins)
 do
     version=$(echo $plugin | cut -d ':' -f 2)
     name=$(echo $plugin | cut -d ':' -f 1)
+    echo "Building $name"
     if [ -d "BUILD/${name}" ]
     then
         rm -rf "BUILD/${name}"
