@@ -12,7 +12,7 @@ do
     then
         rm -rf "BUILD/${name}"
     fi
-    mkdir "BUILD/${name}/${name}"
+    mkdir -p "BUILD/${name}/${name}"
     if [ x$version == 'x' ]; then
         LINK="${PLUGINS_MIRROR}/latest/${name}.hpi" -o "BUILD/${name}/${name}.hpi"
     else
