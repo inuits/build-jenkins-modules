@@ -1,3 +1,16 @@
 greenballs
 publish-over-ssh:1.5
 ircbot
+analysis-core
+clover
+doxygen
+dry
+git
+htmlpublisher
+jdepend
+plot
+pmd
+chucknorris
+promoted-builds
+violations
+xunit
