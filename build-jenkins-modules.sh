@@ -34,7 +34,6 @@ do
     cd ..
     echo "Build of $name returned with $RETVAL"
     [ $RETVAL -ne 0 ] && exit $RETVAL
-    exit 1
 done
 if [ -d ARTEFACTS ]
 then
