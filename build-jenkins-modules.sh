@@ -17,7 +17,7 @@ do
         LINK="${PLUGINS_MIRROR}/latest/${name}.hpi"
     else
         echo "Building $name version $version"
-        LINK="${PLUGINS_MIRROR}/download/plugins/${name}/${versioni}/${name}.hpi"
+        LINK="${PLUGINS_MIRROR}/download/plugins/${name}/${version}/${name}.hpi"
     fi
     wget --no-check-certificate "$LINK" -O "BUILD/${name}/${name}.hpi"
     cd BUILD/${name}/${name}
