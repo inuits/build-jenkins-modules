@@ -19,7 +19,7 @@ do
         echo "Building $name version $version"
         LINK="${PLUGINS_MIRROR}/download/plugins/${name}/${version}/${name}.hpi"
     fi
-    wget --no-check-certificate "$LINK" -O "BUILD/${name}/${name}.hpi"
+    wget --no-check-certificate "$LINK" -O "BUILD/${name}/${name}.hpi" || exit 1
     cd BUILD/${name}/${name}
     unzip ../${name}.hpi
     if [ x$version == 'x' ]; then
