@@ -42,7 +42,3 @@ fi
 mkdir ARTIFACTS
 mv BUILD/*.rpm ARTIFACTS
 rm -rf BUILD
-
-
-
-
