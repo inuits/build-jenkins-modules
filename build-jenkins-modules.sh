@@ -35,12 +35,12 @@ do
     echo "Build of $name returned with $RETVAL"
     [ $RETVAL -ne 0 ] && exit $RETVAL
 done
-if [ -d ARTEFACTS ]
+if [ -d ARTIFACTS ]
 then
-    rm -rf ARTEFACTS
+    rm -rf ARTIFACTS
 fi
-mkdir ARTEFACTS
-mv BUILD/*.rpm ARTEFACTS
+mkdir ARTIFACTS
+mv BUILD/*.rpm ARTIFACTS
 rm -rf BUILD
 
 
