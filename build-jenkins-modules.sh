@@ -5,8 +5,8 @@ FPM="/usr/lib/ruby/gems/1.8/bin/fpm"
 
 for plugin in $(grep -v '#' < jenkins-plugins)
 do
-    version=$(echo $plugin | cut -d ':' -f 2)
-    name=$(echo $plugin | cut -d ':' -f 1)
+    name=$(echo $plugin | awk -F : '{print $1}')
+    version=$(echo $plugin | awk -F : '{print $2}')
     echo "Building $name"
     if [ -d "BUILD/${name}" ]
     then
