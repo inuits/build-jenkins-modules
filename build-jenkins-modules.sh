@@ -26,7 +26,7 @@ do
         version="$(grep Plugin-Version: < META-INF/MANIFEST.MF|cut -d ' ' -f 2)"
     fi
     cd ../..
-    $FPM -n "jenkins-plugin-${name}" -v "$version" -s dir -t rpm \
+ echo   $FPM -n "jenkins-plugin-${name}" -v "$version" -s dir -t rpm \
         --prefix /var/lib/jenkins/plugins/ -C "${name}" \
         --description "Jenkins plugin ${name}" \
         --url "${PLUGINS_MIRROR}/download/plugins/${name}"
@@ -34,6 +34,7 @@ do
     cd ..
     echo "Build of $name returned with $RETVAL"
     [ $RETVAL -ne 0 ] && exit $RETVAL
+    exit 1
 done
 if [ -d ARTEFACTS ]
 then
