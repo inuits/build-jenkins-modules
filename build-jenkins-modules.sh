@@ -13,9 +13,8 @@ do
         rm -rf "BUILD/${name}"
     fi
     mkdir -p "BUILD/${name}/${name}"
-    cat > "BUILD/${name}/rpm-postinstall-${name}.sh" << EOM
+    cat > "BUILD/rpm-postinstall-${name}.sh" << EOM
 chown -R jenkins: /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
-rm var/lib/jenkins/plugins/rpm-postinstall-${name}.sh
 EOM
     chmox +x "BUILD/${name}/postinstall.sh"
     if [ x$version == 'x' ]; then
@@ -35,7 +34,7 @@ EOM
         --prefix /var/lib/jenkins/plugins/ -C "${name}" \
         -a noarch --description "Jenkins plugin ${name}" \
         --url "${PLUGINS_MIRROR}/download/plugins/${name}" \
-        --post-install "${name}/rpm-postinstall-${name}.sh"
+        --post-install "rpm-postinstall-${name}.sh"
     RETVAL="$?"
     cd ..
     echo "Build of $name returned with $RETVAL"
