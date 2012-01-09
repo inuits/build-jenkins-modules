@@ -16,7 +16,6 @@ do
     cat > "BUILD/rpm-postinstall-${name}.sh" << EOM
 chown -R jenkins: /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
 EOM
-    chmox +x "BUILD/${name}/postinstall.sh"
     if [ x$version == 'x' ]; then
         LINK="${PLUGINS_MIRROR}/latest/${name}.hpi"
     else
