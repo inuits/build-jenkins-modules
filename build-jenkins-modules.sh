@@ -28,7 +28,7 @@ do
     cd ../..
     $FPM -n "jenkins-plugin-${name}" -v "$version" -s dir -t rpm \
         --prefix /var/lib/jenkins/plugins/ -C "${name}" \
-        -n noarch --description "Jenkins plugin ${name}" \
+        -a noarch --description "Jenkins plugin ${name}" \
         --url "${PLUGINS_MIRROR}/download/plugins/${name}"
     RETVAL="$?"
     cd ..
