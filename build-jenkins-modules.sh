@@ -3,7 +3,7 @@ mkdir -p BUILD
 PLUGINS_MIRROR="http://updates.jenkins-ci.org/"
 FPM="/usr/lib/ruby/gems/1.8/bin/fpm"
 
-for plugin in $(grev -v '#' < jenkins-plugins)
+for plugin in $(grep -v '#' < jenkins-plugins)
 do
     version=$(echo $plugin | cut -d ':' -f 2)
     name=$(echo $plugin | cut -d ':' -f 1)
