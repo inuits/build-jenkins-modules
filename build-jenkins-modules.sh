@@ -1,7 +1,6 @@
 #!/bin/bash
 mkdir -p BUILD
 PLUGINS_MIRROR="http://updates.jenkins-ci.org"
-FPM="/usr/lib/ruby/gems/1.8/bin/fpm"
 
 for plugin in $(grep -v '#' < jenkins-plugins)
 do
@@ -30,7 +29,7 @@ EOM
         version="$(grep Plugin-Version: < META-INF/MANIFEST.MF|cut -d ' ' -f 2|tr -d "\r")"
     fi
     cd ../..
-    $FPM -n "jenkins-plugin-${name}" -v "$version" -s dir -t rpm \
+    fpm -n "jenkins-plugin-${name}" -v "$version" -s dir -t rpm \
         --prefix /var/lib/jenkins/plugins/ -C "${name}" \
         -a noarch --description "Jenkins plugin ${name}" \
         --url "${PLUGINS_MIRROR}/download/plugins/${name}" \
