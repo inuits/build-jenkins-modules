@@ -1,8 +1,10 @@
 analysis-core
+ant
 build-pipeline-plugin
 checkstyle
 chucknorris
 clover
+cvs
 doxygen
 dry
 git
@@ -10,11 +12,15 @@ greenballs
 htmlpublisher
 instant-messaging
 ircbot
+javadoc
 jdepend
+maven-plugin
 plot
 pmd
 promoted-builds
 publish-over-ssh
+ssh-slaves
 subversion:1.35
+translation
 violations
 xunit
