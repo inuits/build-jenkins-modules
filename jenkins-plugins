@@ -19,6 +19,7 @@ plot
 pmd
 promoted-builds
 publish-over-ssh
+pwauth
 ssh-slaves
 subversion:1.35
 translation
