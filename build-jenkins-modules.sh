@@ -1,6 +1,6 @@
 #!/bin/bash
 mkdir -p BUILD
-PLUGINS_MIRROR="http://updates.jenkins-ci.org"
+PLUGINS_MIRROR="https://updates.jenkins-ci.org"
 
 for plugin in $(grep -v '#' < jenkins-plugins)
 do
