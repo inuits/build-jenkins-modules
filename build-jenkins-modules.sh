@@ -9,7 +9,8 @@ function package_plugin() {
   local name=$1;
   local version=$2;
   local build_dir="BUILD/${name}";
-  local plugin_file="BUILD/${name}/${name}.hpi";
+  local plugin_file="${build_dir}/${name}.hpi";
+  local plugin_dir="${build_dir}/${name}/";
   local manifest_file="BUILD/${name}.manifest";
   local plugin_url plugin_deps plugin_desc plugin_hudson;
   local depname depversion;
@@ -18,11 +19,10 @@ function package_plugin() {
   if [ -d "BUILD/${name}" ]; then
      rm -rf "BUILD/${name}";
   fi
-  mkdir -p "$build_dir";
-
+  mkdir -p "$build_dir/${name}";
   cat > "BUILD/rpm-postinstall-${name}.sh" << EOM
-chown -R jenkins: /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
-##chown jenkins: /var/lib/jenkins/plugins/
+chown -R jenkins:jenkins /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
+chown jenkins:jenkins /var/lib/jenkins/plugins
 EOM
 
   if [ x"$version" == 'x' ]; then
