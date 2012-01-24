@@ -10,7 +10,7 @@ function package_plugin() {
   local version=$2;
   local build_dir="BUILD/${name}";
   local plugin_file="BUILD/${name}/${name}.hpi";
-  local manifest_file="BUILD/${name}/manifest";
+  local manifest_file="BUILD/${name}.manifest";
   local plugin_url plugin_deps plugin_desc plugin_hudson;
   local depname depversion;
 
