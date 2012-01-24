@@ -40,7 +40,7 @@ EOM
   version="$( grep 'Plugin-Version:' < $manifest_file |cut -d ' ' -f 2 )";
   plugin_deps="$( grep 'Plugin-Dependencies:' < $manifest_file | cut -d ' ' -f 2 )";
   plugin_desc="$( grep 'Long-Name:' < $manifest_file | cut -d ' ' -f 2- )";
-  plugin_hudson="$( grep 'Hudson-Version:' < $manifest_file | cut -d ' ' -f 2 )";
+  plugin_hudson="$( grep 'Hudson-Version:' < $manifest_file | cut -d ' ' -f 2 | grep -o '[0-9]\+\.[0-9]\+' )";
   plugin_url="$( grep 'Url:' < $manifest_file | cut -d ' ' -f 2- )";
 
   echo 'FPM packaging starts here!'
@@ -51,7 +51,12 @@ EOM
   fpm_cmd="${fpm_cmd} --prefix ${JENKINS_PLUGIN_DIR} -C ${build_dir} -a noarch";
   fpm_cmd="${fpm_cmd} --description \"${plugin_desc}\" --url \"${plugin_url}\"";
   fpm_cmd="${fpm_cmd} --post-install BUILD/rpm-postinstall-${name}.sh";
-  fpm_cmd="${fpm_cmd} -d 'jenkins >= ${plugin_hudson}'";
+  if [ -n $plugin_hudson ]; then
+    fpm_cmd="${fpm_cmd} -d 'jenkins'";
+  else
+    fpm_cmd="${fpm_cmd} -d 'jenkins >= ${plugin_hudson}'";
+  fi;
+
 
   local oldifs="${IFS}"; IFS=',';
   for dep in $dependencies; do
