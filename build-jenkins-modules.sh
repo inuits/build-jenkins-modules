@@ -6,8 +6,9 @@ JENKINS_DIR="${JENKINS_DIR-/var/lib/jenkins}"
 JENKINS_PLUGIN_DIR="${JENKINS_PLUGIN_DIR-${JENKINS_DIR}/plugins}"
 
 function package_plugin() {
-  local name=$1;
-  local version=$2;
+  local name="$1";
+  local version="$2";
+  local dependencies="$3";
   local build_dir="BUILD/${name}";
   local plugin_file="${build_dir}/${name}.hpi";
   local plugin_dir="${build_dir}/${name}/";
@@ -53,6 +54,9 @@ EOM
   fpm_cmd="${fpm_cmd} -d 'jenkins >= ${plugin_hudson}'";
 
   local oldifs="${IFS}"; IFS=',';
+  for dep in $dependencies; do
+    fpm_cmd="${fpm_cmd} -d '${dep}'";
+  done;
   for dep in $plugin_deps; do
       if echo $dep | grep -q -v '=optional'; then
         depname="$( echo $dep | cut -d ':' -f 1 )";
@@ -88,7 +92,8 @@ for plugin in $(grep -v '#' < jenkins-plugins)
 do
     name=$(echo $plugin | awk -F : '{print $1}')
     version=$(echo $plugin | awk -F : '{print $2}')
-    package_plugin $name $version || exit 1;
+    dependencies=$(echo $plugin | awk -F : '{print $3}')
+    package_plugin "$name" "$version" "$dependencies" || exit 1;
 done
 
 echo "PWD: `pwd`"
