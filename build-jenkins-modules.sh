@@ -101,7 +101,6 @@ do
     package_plugin "$name" "$version" "$dependencies" || exit 1;
 done
 
-echo "PWD: `pwd`"
 
 if [ -d ARTIFACTS ]
 then
