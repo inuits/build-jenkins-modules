@@ -7,7 +7,7 @@ clover
 cvs
 doxygen
 dry
-git
+git::git
 greenballs
 htmlpublisher
 instant-messaging
