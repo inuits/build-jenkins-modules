@@ -92,7 +92,7 @@ get_plugin_manifest_from_hpi() {
 }
 
 get_all_plugins_from_update_center() {
-  wget  -q "${JENKINS_PLUGINS_MIRROR}/update-center.json" -O - | grep -o plugins/[^/]*  | sed -e "s@^plugins/@@g"
+  wget --no-check-certificate -q "${JENKINS_PLUGINS_MIRROR}/update-center.json" -O - | grep -o "plugins/[^/]*"  | sed -e "s@^plugins/@@g"
 }
 
 ## Create build folder.
