@@ -5,7 +5,7 @@ JENKINS_PLUGINS_MIRROR="${JENKINS_PLUGINS_MIRROR-https://updates.jenkins-ci.org}
 JENKINS_DIR="${JENKINS_DIR-/var/lib/jenkins}"
 JENKINS_PLUGIN_DIR="${JENKINS_PLUGIN_DIR-${JENKINS_DIR}/plugins}"
 
-function package_plugin() {
+function package_plugin_rpm() {
   local name="$1";
   local version="$2";
   local dependencies="$3";
@@ -26,7 +26,7 @@ chown -R jenkins:jenkins /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugi
 chown jenkins:jenkins /var/lib/jenkins/plugins
 EOM
 
-  if [ x"$version" == 'x' ]; then
+  if [[ x"$version" == 'x' || x"$version" == 'x-' ]]; then
     echo "Fetching ${name}/latest from jenkins mirror";
     plugin_url="${JENKINS_PLUGINS_MIRROR}/latest/${name}.hpi"
   else
@@ -91,14 +91,21 @@ get_plugin_manifest_from_hpi() {
   fi;
 }
 
+get_all_plugins_from_update_center() {
+  wget  -q "${JENKINS_PLUGINS_MIRROR}/update-center.json" -O - | grep -o plugins/[^/]*  | sed -e "s@^plugins/@@g"
+}
+
 ## Create build folder.
 mkdir -p BUILD
-for plugin in $(grep -v '#' < jenkins-plugins)
+#for plugin in $(grep -v '#' < jenkins-plugins)
+for plugin in $( get_all_plugins_from_update_center )
 do
-    name=$(echo $plugin | awk -F : '{print $1}')
-    version=$(echo $plugin | awk -F : '{print $2}')
-    dependencies=$(echo $plugin | awk -F : '{print $3}')
-    package_plugin "$name" "$version" "$dependencies" || exit 1;
+    extras=$( grep "^${plugin}\(:.*\)\?\$" jenkins-plugins-rpm );
+    #name=$(echo $plugin | awk -F : '{print $1}')
+    name=$plugin;
+    version=$(echo $extras | awk -F : '{print $2}')
+    dependencies=$(echo $extras | awk -F : '{print $3}')
+    package_plugin_rpm "$name" "$version" "$dependencies" || exit 1;
 done
 
 
