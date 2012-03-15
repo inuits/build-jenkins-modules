@@ -74,7 +74,7 @@ EOM
   done;
   IFS="${oldifs}";
   fpm_cmd="${fpm_cmd} "
-  eval $fpm_cmd 
+  eval $fpm_cmd
   retval=$?
   echo "Build of ${name} finished with return status: $retval";
   return $retval;
