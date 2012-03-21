@@ -5,10 +5,22 @@ JENKINS_PLUGINS_MIRROR="${JENKINS_PLUGINS_MIRROR-https://updates.jenkins-ci.org}
 JENKINS_DIR="${JENKINS_DIR-/var/lib/jenkins}"
 JENKINS_PLUGIN_DIR="${JENKINS_PLUGIN_DIR-${JENKINS_DIR}/plugins}"
 
+OLDPS4="${PS4}"
+function prefix() {
+  local count=$1;
+  local nr=$2;
+  local len=`echo $count | wc -c`;
+  printf "[%${len}d/%d]" $nr $count;
+}
+
 function package_plugin_rpm() {
   local name="$1";
   local version="$2";
   local dependencies="$3";
+  local count=$4;
+  local nr=$5;
+
+  local prefix=`prefix $count $nr`;
   local build_dir="BUILD/${name}";
   local plugin_file="${build_dir}/${name}.hpi";
   local plugin_dir="${build_dir}/${name}/";
@@ -16,7 +28,7 @@ function package_plugin_rpm() {
   local plugin_url plugin_deps plugin_desc plugin_hudson;
   local depname depversion;
 
-  echo "Preparing build environment for: ${name}"
+  echo "${prefix} Preparing build environment for: ${name}"
   if [ -d "BUILD/${name}" ]; then
      rm -rf "BUILD/${name}";
   fi
@@ -27,15 +39,15 @@ chown jenkins:jenkins /var/lib/jenkins/plugins
 EOM
 
   if [[ x"$version" == 'x' || x"$version" == 'x-' ]]; then
-    echo "Fetching ${name}/latest from jenkins mirror";
+    echo "${prefix} Fetching ${name}/latest from jenkins mirror";
     plugin_url="${JENKINS_PLUGINS_MIRROR}/latest/${name}.hpi"
   else
-    echo "Fetching ${name}/${version} from jenkins mirror";
+    echo "${prefix} Fetching ${name}/${version} from jenkins mirror";
     plugin_url="${JENKINS_PLUGINS_MIRROR}/download/plugins/${name}/${version}/${name}.hpi"
   fi
-  wget -q --no-check-certificate "$plugin_url" -O "$plugin_file" || return 1;
+  wget -nv --no-check-certificate "$plugin_url" -O "$plugin_file" || return 1;
 
-  get_plugin_manifest_from_hpi "$plugin_file" "$manifest_file" || ( echo 'Plugin file not found!' 1>&2  && return 1; )
+  get_plugin_manifest_from_hpi "$plugin_file" "$manifest_file" || ( echo "Plugin file not found: '${$plugin_file}'!" 1>&2  && return 1; )
 
   version="$( grep 'Plugin-Version:' < $manifest_file |cut -d ' ' -f 2 )";
   plugin_deps="$( grep 'Plugin-Dependencies:' < $manifest_file | cut -d ' ' -f 2 )";
@@ -43,10 +55,10 @@ EOM
   plugin_hudson="$( grep 'Hudson-Version:' < $manifest_file | cut -d ' ' -f 2 | grep -o '[0-9]\+\.[0-9]\+' )";
   plugin_url="$( grep 'Url:' < $manifest_file | cut -d ' ' -f 2- )";
 
-  echo 'FPM packaging starts here!'
-  echo "+ Plugin name: ${name}"
-  echo "+ Version: ${version}"
-  echo "+ Required jenkins version: ${plugin_hudson}"
+  echo "${prefix} FPM packaging starts here!"
+  echo "${prefix} + Plugin name: ${name}"
+  echo "${prefix} + Version: ${version}"
+  echo "${prefix} + Required jenkins version: ${plugin_hudson}"
   local fpm_cmd="fpm -n jenkins-plugin-${name} -v ${version} -s dir -t rpm";
   fpm_cmd="${fpm_cmd} --prefix ${JENKINS_PLUGIN_DIR} -C ${build_dir} -a noarch";
   fpm_cmd="${fpm_cmd} --description \"${plugin_desc}\" --url \"${plugin_url}\"";
@@ -67,16 +79,16 @@ EOM
         depname="$( echo $dep | cut -d ':' -f 1 )";
         depversion="$( echo $dep | cut -d ':' -f 2 )" ;
         fpm_cmd="${fpm_cmd} -d 'jenkins-plugin-${depname} >= ${depversion}'"
-        echo "++ Dependency found: $dep";
+        echo "${prefix} ++ Dependency found: $dep";
       else
-        echo "-- Optional dependency found: $dep";
+        echo "${prefix} -- Optional dependency found: $dep";
       fi;
   done;
   IFS="${oldifs}";
   fpm_cmd="${fpm_cmd} "
   eval $fpm_cmd
   retval=$?
-  echo "Build of ${name} finished with return status: $retval";
+  echo "${prefix} Build of ${name} finished with return status: $retval";
   return $retval;
 }
 
@@ -95,19 +107,38 @@ get_all_plugins_from_update_center() {
   wget --no-check-certificate -q "${JENKINS_PLUGINS_MIRROR}/update-center.json" -O - | grep -o "plugins/[^/]*"  | sed -e "s@^plugins/@@g"
 }
 
-## Create build folder.
-mkdir -p BUILD
-#for plugin in $(grep -v '#' < jenkins-plugins)
-for plugin in $( get_all_plugins_from_update_center )
-do
+package_all() {
+  local count=$#;
+  local nr=0;
+  local extras name version dependencies;
+  for plugin in $*;
+  do
+    let nr++;
     extras=$( grep "^${plugin}\(:.*\)\?\$" jenkins-plugins-rpm );
     #name=$(echo $plugin | awk -F : '{print $1}')
     name=$plugin;
     version=$(echo $extras | awk -F : '{print $2}')
     dependencies=$(echo $extras | awk -F : '{print $3}')
-    package_plugin_rpm "$name" "$version" "$dependencies" || exit 1;
-done
+    package_plugin_rpm "$name" "$version" "$dependencies" "$count" "$nr" || echo $plugin >> faillist.txt
+  done
+}
 
+## Create build folder.
+mkdir -p BUILD
+if [ -f faillist.txt ]
+then
+  rm faillist.txt
+fi
+
+
+#for plugin in $(grep -v '#' < jenkins-plugins)
+if [ -z $1 ]; then
+  package_all $( get_all_plugins_from_update_center )
+else
+  package_all $*
+fi
+
+export PS4="${OLDPS4}"
 
 if [ -d ARTIFACTS ]
 then
