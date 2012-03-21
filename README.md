@@ -10,7 +10,13 @@ dependency on jenkins is added as 'jenkins >= VERSION'.
 
 Other plugin Dependencies found in the manifest file are also added as rpm deps too.
 
-## jenkins-plugins File Format
+## Sources
+
+The script will attempt to get the hpi file from the jenkins updates server.
+In cases that this does not work, create a folder 'manual' and place the {name}.hpi file
+in there, the script will then use that file in stead of attempting to wget it.
+
+## jenkins-plugins-rpm File Format
 
 Each line defined a plugin to build using the script. Arguments on each line are separated by a colon (:).
 

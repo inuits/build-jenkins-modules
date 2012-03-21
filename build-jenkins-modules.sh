@@ -38,14 +38,18 @@ chown -R jenkins:jenkins /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugi
 chown jenkins:jenkins /var/lib/jenkins/plugins
 EOM
 
-  if [[ x"$version" == 'x' || x"$version" == 'x-' ]]; then
-    echo "${prefix} Fetching ${name}/latest from jenkins mirror";
-    plugin_url="${JENKINS_PLUGINS_MIRROR}/latest/${name}.hpi"
+  if [ -f "manual/${name}.hpi" ]; then
+    cp -rv "manual/${name}.hpi" $plugin_file;
   else
-    echo "${prefix} Fetching ${name}/${version} from jenkins mirror";
-    plugin_url="${JENKINS_PLUGINS_MIRROR}/download/plugins/${name}/${version}/${name}.hpi"
-  fi
-  wget -nv --no-check-certificate "$plugin_url" -O "$plugin_file" || return 1;
+    if [[ x"$version" == 'x' || x"$version" == 'x-' ]]; then
+      echo "${prefix} Fetching ${name}/latest from jenkins mirror";
+      plugin_url="${JENKINS_PLUGINS_MIRROR}/latest/${name}.hpi"
+    else
+      echo "${prefix} Fetching ${name}/${version} from jenkins mirror";
+      plugin_url="${JENKINS_PLUGINS_MIRROR}/download/plugins/${name}/${version}/${name}.hpi"
+    fi
+    wget -nv --no-check-certificate "$plugin_url" -O "$plugin_file" || return 1;
+  fi;
 
   get_plugin_manifest_from_hpi "$plugin_file" "$manifest_file" || ( echo "Plugin file not found: '${$plugin_file}'!" 1>&2  && return 1; )
 
