@@ -89,7 +89,7 @@ EOM
       fi;
   done;
   IFS="${oldifs}";
-  fpm_cmd="${fpm_cmd} "
+  fpm_cmd="${fpm_cmd} ${name}.hpi"
   eval $fpm_cmd
   retval=$?
   echo "${prefix} Build of ${name} finished with return status: $retval";
