@@ -1,3 +1,0 @@
-This makes RPMS for Jenkins plugins.
-
-You will have to restart jenkins after installing a rpm to make the new plugins working.
