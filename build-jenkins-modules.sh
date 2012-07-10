@@ -34,6 +34,7 @@ function package_plugin_rpm() {
   fi
   mkdir -p "$build_dir/${name}";
   cat > "BUILD/rpm-postinstall-${name}.sh" << EOM
+[ -d /var/lib/jenkins/plugins/${name} ] || mkdir /var/lib/jenkins/plugins/${name}
 chown -R jenkins:jenkins /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
 chown jenkins:jenkins /var/lib/jenkins/plugins
 EOM
