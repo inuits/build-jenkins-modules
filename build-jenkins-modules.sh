@@ -33,12 +33,6 @@ function package_plugin_rpm() {
      rm -rf "BUILD/${name}";
   fi
   mkdir -p "$build_dir/${name}";
-  cat > "BUILD/rpm-postinstall-${name}.sh" << EOM
-[ -d /var/lib/jenkins/plugins/${name} ] || mkdir /var/lib/jenkins/plugins/${name}
-chown -R jenkins:jenkins /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
-chown jenkins:jenkins /var/lib/jenkins/plugins
-EOM
-
   if [ -f "manual/${name}.hpi" ]; then
     cp -rv "manual/${name}.hpi" $plugin_file;
   else
@@ -67,7 +61,7 @@ EOM
   local fpm_cmd="fpm -n jenkins-plugin-${name} -v ${version} -s dir -t rpm";
   fpm_cmd="${fpm_cmd} --prefix ${JENKINS_PLUGIN_DIR} -C ${build_dir} -a noarch";
   fpm_cmd="${fpm_cmd} --description \"${plugin_desc}\" --url \"${plugin_url}\"";
-  fpm_cmd="${fpm_cmd} --post-install BUILD/rpm-postinstall-${name}.sh";
+  fpm_cmd="${fpm_cmd} --rpm-user jenkins --rpm-group jenkins";
   if [ -n $plugin_hudson ]; then
     fpm_cmd="${fpm_cmd} -d 'jenkins'";
   else
