@@ -59,6 +59,12 @@ function package_plugin_rpm() {
   echo "${prefix} + Version: ${version}"
   echo "${prefix} + Required jenkins version: ${plugin_hudson}"
   local fpm_cmd="fpm -n jenkins-plugin-${name} -v ${version} -s dir -t rpm";
+  if echo $version | grep -q "-"; then
+    real_version="${version%%-*}";
+    fpm_cmd="${fpm_cmd} -v ${version%%-*} --iteration ${version##*-}";
+  else
+    fpm_cmd="${fpm_cmd} -v ${version}";
+  fi;
   fpm_cmd="${fpm_cmd} --prefix ${JENKINS_PLUGIN_DIR} -C ${build_dir} -a noarch";
   fpm_cmd="${fpm_cmd} --description \"${plugin_desc}\" --url \"${plugin_url}\"";
   fpm_cmd="${fpm_cmd} --rpm-user jenkins --rpm-group jenkins";
