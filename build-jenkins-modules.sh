@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PATH="/var/lib/gems/1.8/bin:$PATH"
+
 ## These values should not be changed, but can be if needed.
 JENKINS_PLUGINS_MIRROR="${JENKINS_PLUGINS_MIRROR-https://updates.jenkins-ci.org}"
 JENKINS_DIR="${JENKINS_DIR-/var/lib/jenkins}"
@@ -13,12 +15,13 @@ function prefix() {
   printf "[%${len}d/%d]" $nr $count;
 }
 
-function package_plugin_rpm() {
+function package_plugin() {
   local name="$1";
   local version="$2";
   local dependencies="$3";
   local count=$4;
   local nr=$5;
+  local dist=$6;
 
   local prefix=`prefix $count $nr`;
   local build_dir="BUILD/${name}";
@@ -28,14 +31,29 @@ function package_plugin_rpm() {
   local plugin_url plugin_deps plugin_desc plugin_hudson;
   local depname depversion;
 
+  case "$dist" in
+    deb)
+      arch="all"
+      user="jenkins"
+      group="nogroup"
+      ;;
+    rpm)
+      arch="noarch"
+      user="jenkins"
+      group="jenkins"
+      ;;
+    *)
+      echo "Operatinsystem ${dist} is not supported." && exit 255
+  esac
+
   echo "${prefix} Preparing build environment for: ${name}"
   if [ -d "BUILD/${name}" ]; then
      rm -rf "BUILD/${name}";
   fi
   mkdir -p "$build_dir/${name}";
-  cat > "BUILD/rpm-postinstall-${name}.sh" << EOM
-chown -R jenkins:jenkins /var/lib/jenkins/plugins/${name} /var/lib/jenkins/plugins/${name}.hpi
-chown jenkins:jenkins /var/lib/jenkins/plugins
+  cat > "BUILD/${dist}-postinstall-${name}.sh" << EOM
+#!/bin/sh
+chown -R ${user}:${group} /var/lib/jenkins/plugins
 EOM
 
   if [ -f "manual/${name}.hpi" ]; then
@@ -63,10 +81,10 @@ EOM
   echo "${prefix} + Plugin name: ${name}"
   echo "${prefix} + Version: ${version}"
   echo "${prefix} + Required jenkins version: ${plugin_hudson}"
-  local fpm_cmd="fpm -n jenkins-plugin-${name} -v ${version} -s dir -t rpm";
-  fpm_cmd="${fpm_cmd} --prefix ${JENKINS_PLUGIN_DIR} -C ${build_dir} -a noarch";
+  local fpm_cmd="fpm -n jenkins-plugin-${name} -v ${version} -s dir -t ${dist}";
+  fpm_cmd="${fpm_cmd} --prefix ${JENKINS_PLUGIN_DIR} -C ${build_dir} -a ${arch}";
   fpm_cmd="${fpm_cmd} --description \"${plugin_desc}\" --url \"${plugin_url}\"";
-  fpm_cmd="${fpm_cmd} --post-install BUILD/rpm-postinstall-${name}.sh";
+  fpm_cmd="${fpm_cmd} --after-install BUILD/${dist}-postinstall-${name}.sh";
   if [ -n $plugin_hudson ]; then
     fpm_cmd="${fpm_cmd} -d 'jenkins'";
   else
@@ -123,7 +141,8 @@ package_all() {
     name=$plugin;
     version=$(echo $extras | awk -F : '{print $2}')
     dependencies=$(echo $extras | awk -F : '{print $3}')
-    package_plugin_rpm "$name" "$version" "$dependencies" "$count" "$nr" || echo $plugin >> faillist.txt
+    package_plugin "$name" "$version" "$dependencies" "$count" "$nr" rpm || echo $plugin >> faillist.txt
+    package_plugin "$name" "$version" "$dependencies" "$count" "$nr" deb || echo $plugin >> faillist.txt
   done
 }
 
@@ -150,4 +169,5 @@ then
 fi
 mkdir ARTIFACTS
 mv -v *.rpm ARTIFACTS/
+mv -v *.deb ARTIFACTS/
 rm -rf BUILD
