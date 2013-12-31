@@ -81,7 +81,7 @@ EOM
   echo "${prefix} + Plugin name: ${name}"
   echo "${prefix} + Version: ${version}"
   echo "${prefix} + Required jenkins version: ${plugin_hudson}"
-  local fpm_cmd="fpm -n jenkins-plugin-${name} -v ${version} -s dir -t ${dist}";
+  local fpm_cmd="fpm -n jenkins-plugin-${name} -v ${version} -s dir -t ${dist} --epoch=1";
   fpm_cmd="${fpm_cmd} --prefix ${JENKINS_PLUGIN_DIR} -C ${build_dir} -a ${arch}";
   fpm_cmd="${fpm_cmd} --description \"${plugin_desc}\" --url \"${plugin_url}\"";
   fpm_cmd="${fpm_cmd} --after-install BUILD/${dist}-postinstall-${name}.sh";
