@@ -60,8 +60,8 @@ EOM
     cp -rv "manual/${name}.hpi" $plugin_file;
   else
     if [[ x"$version" == 'x' || x"$version" == 'x-' ]]; then
-      echo "${prefix} Fetching ${name}/latest from jenkins mirror";
-      plugin_url="${JENKINS_PLUGINS_MIRROR}/latest/${name}.hpi"
+      echo "${prefix} Fetching ${name}/stable/latest from jenkins mirror";
+      plugin_url="${JENKINS_PLUGINS_MIRROR}/stable/latest/${name}.hpi"
     else
       echo "${prefix} Fetching ${name}/${version} from jenkins mirror";
       plugin_url="${JENKINS_PLUGINS_MIRROR}/download/plugins/${name}/${version}/${name}.hpi"
